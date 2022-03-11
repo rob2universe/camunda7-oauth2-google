@@ -1,4 +1,4 @@
-package org.camunda.example.config;
+package org.camunda.example.oauth2;
 
 import org.camunda.example.filter.rest.StatelessUserAuthenticationFilter;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-//@Configuration
+@Configuration
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 20)
 public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -32,7 +32,7 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
         filterRegistration.setFilter(new StatelessUserAuthenticationFilter());
         filterRegistration.setOrder(102); // make sure the filter is registered after the Spring Security Filter Chain
-        filterRegistration.addUrlPatterns("/rest/*");
+        filterRegistration.addUrlPatterns("/engine-rest/*");
         return filterRegistration;
     }
 

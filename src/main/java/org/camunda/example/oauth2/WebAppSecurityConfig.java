@@ -1,6 +1,7 @@
-package org.camunda.example.config;
+package org.camunda.example.oauth2;
 
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -15,22 +16,22 @@ import java.util.Collections;
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 15)
 public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 
+  @Autowired
+  private GoogleOAuth2UserService oauthUserService;
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
-        .antMatcher("/camunda/app/**")
+        .csrf().disable()
+        .antMatcher("/**")
         .authorizeRequests().anyRequest().authenticated()
         .and()
-//        .authorizeRequests().antMatchers("/**").permitAll()
+        .oauth2Login()
+            // use own service to create principal
+            .userInfoEndpoint().userService(oauthUserService)
 //        .and()
-//        .httpBasic();// this is just an example, use any auth mechanism you like
-        .oauth2Login();
-//        .userInfoEndpoint()
-//        .oidcUserService(oidcUserService);
-
-    http.csrf().disable();
-
-
+//        .successHandler(new CamundaAuthenticationSuccessHandler())
+    ;
   }
 
   @Bean

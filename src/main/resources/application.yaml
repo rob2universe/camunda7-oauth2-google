@@ -23,15 +23,11 @@ spring:
       client:
         registration:
           google:
-            clientId: '832780395862-sk6knpak6t0uln900d8671tiib0vt008.apps.googleusercontent.com'
-            clientSecret: '...'
-#
-#            redirect-uri: 'http://localhost:8080/'
+            clientId: "832780395862-sk6knpak6t0uln900d8671tiib0vt008.apps.googleusercontent.com"
+            clientSecret: "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"
+            scope:
+              - email
+              - profile
 server:
   port: 8080
 
-
-# OAuth client key
-# 832780395862-sk6knpak6t0uln900d8671tiib0vt008:
-# OAuth client secret
-#  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

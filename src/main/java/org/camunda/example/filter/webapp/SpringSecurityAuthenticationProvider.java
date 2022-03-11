@@ -3,6 +3,7 @@ package org.camunda.example.filter.webapp;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
+import org.camunda.example.oauth2.GoogleOAuth2User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -26,11 +27,11 @@ public class SpringSecurityAuthenticationProvider extends ContainerBasedAuthenti
         }
 
         String name = authentication.getName();
-        LOG.debug("extracted user: {}", name);
         if (name == null || name.isEmpty()) {
             return AuthenticationResult.unsuccessful();
         }
 
+        LOG.info("Setting authentication for {}", name);
         AuthenticationResult authenticationResult = new AuthenticationResult(name, true);
         authenticationResult.setGroups(getUserGroups(authentication));
 
@@ -45,9 +46,7 @@ public class SpringSecurityAuthenticationProvider extends ContainerBasedAuthenti
                 .map(res -> res.getAuthority())
                 .map(res -> res.substring(5)) // Strip "ROLE_"
                 .collect(Collectors.toList());
-
         return groupIds;
-
     }
 
 }

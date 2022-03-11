@@ -1,6 +1,7 @@
 package org.camunda.example.filter.rest;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class StatelessUserAuthenticationFilter implements Filter {
 
     @Override
@@ -26,46 +28,39 @@ public class StatelessUserAuthenticationFilter implements Filter {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        String username;
+        String name;
 
         if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
+            name = ((UserDetails) principal).getUsername();
+            log.debug("Authentication UserDetails: {}", ((UserDetails) principal));
         } else {
-            username = principal.toString();
+            name = principal.toString();
         }
 
-
         try {
-            engine.getIdentityService().setAuthentication(username, getUserGroups(username));
+            log.info("Setting authentication for {}", name);
+            engine.getIdentityService().setAuthentication(name, getUserGroups(name));
             chain.doFilter(request, response);
         } finally {
             clearAuthentication(engine);
         }
-
     }
 
     @Override
     public void destroy() {
-
     }
 
     private void clearAuthentication(ProcessEngine engine) {
         engine.getIdentityService().clearAuthentication();
     }
 
-    private List<String> getUserGroups(String userId){
-
+    private List<String> getUserGroups(String userId) {
         List<String> groupIds;
-
         org.springframework.security.core.Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         groupIds = authentication.getAuthorities().stream()
                 .map(res -> res.getAuthority())
                 .map(res -> res.substring(5)) // Strip "ROLE_"
                 .collect(Collectors.toList());
-
         return groupIds;
-
     }
-
 }
