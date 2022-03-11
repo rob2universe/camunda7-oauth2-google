@@ -3,7 +3,6 @@ package org.camunda.example.filter.webapp;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
-import org.camunda.example.oauth2.GoogleOAuth2User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -21,12 +20,12 @@ public class SpringSecurityAuthenticationProvider extends ContainerBasedAuthenti
     public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null) {
             return AuthenticationResult.unsuccessful();
         }
 
         String name = authentication.getName();
+        LOG.info("Auth principal {}",authentication.getPrincipal());
         if (name == null || name.isEmpty()) {
             return AuthenticationResult.unsuccessful();
         }

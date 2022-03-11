@@ -19,7 +19,7 @@ public class ProcessTest extends AbstractProcessEngineRuleTest {
     Mocks.register("logger", new LoggerDelegate());
   }
 
-  @Test
+//  @Test
   public void testHappyPath() {
 
     ProcessInstance pi = runtimeService().startProcessInstanceByKey("example-process", withVariables("myVar", "myVarValue"));

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.util.Collections;
 
@@ -17,7 +18,7 @@ import java.util.Collections;
 public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
-  private GoogleOAuth2UserService oauthUserService;
+  private AuthenticationSuccessHandler successHandler;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -27,11 +28,8 @@ public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests().anyRequest().authenticated()
         .and()
         .oauth2Login()
-            // use own service to create principal
-            .userInfoEndpoint().userService(oauthUserService)
-//        .and()
-//        .successHandler(new CamundaAuthenticationSuccessHandler())
-    ;
+        //include if desired. Creates the user in Camunda if it does not exist
+        .successHandler(successHandler);
   }
 
   @Bean

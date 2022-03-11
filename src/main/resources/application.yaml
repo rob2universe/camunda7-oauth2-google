@@ -1,12 +1,11 @@
 camunda:
   bpm:
     admin-user:
-      id: demo
-      password: demo
-      first-name: Dan
-      last-name: Demo
+      id: 116915761348654177223
     filter:
       create: All tasks
+    authorization:
+      enabled: true
 
 spring:
   h2:
