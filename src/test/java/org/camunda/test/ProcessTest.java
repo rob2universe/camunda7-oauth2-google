@@ -1,7 +1,7 @@
 package org.camunda.test;
 
 
-import com.camunda.example.service.LoggerDelegate;
+import org.camunda.example.service.LoggerDelegate;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.mock.Mocks;
