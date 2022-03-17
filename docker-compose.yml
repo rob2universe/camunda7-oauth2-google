@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  taskworkerlogs:
+    container_name: camunda-google-oauth2
+    image: rob2universe/camunda-google-oauth2
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+     - logging.level.root=info
+    ports:
+    - "8080:8080"
+
