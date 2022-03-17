@@ -2,20 +2,16 @@ package org.camunda.example.oauth2;
 
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,9 +23,9 @@ import java.util.Collection;
 @Service
 public class CamundaGoogleAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private IdentityService identityService;
+    private final IdentityService identityService;
 
-    @Value("camunda.bpm.admin-user.id")
+    @Value("${camunda.bpm.admin-user.id}")
     private String adminId;
 
     public CamundaGoogleAuthenticationSuccessHandler(IdentityService identityService) {
@@ -38,13 +34,12 @@ public class CamundaGoogleAuthenticationSuccessHandler implements Authentication
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException {
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         User user = identityService.createUserQuery().userId(oauth2User.getName()).singleResult();
-        if (user == null)
-        {
-            log.debug("Creating user for principal: {}", oauth2User.getName());
+        if (user == null) {
+            log.debug("Creating user for Google principal: {}", oauth2User.getName());
             user = identityService.newUser(oauth2User.getName());
             user.setFirstName(oauth2User.getAttribute("given_name"));
             user.setLastName(oauth2User.getAttribute("family_name"));
@@ -52,20 +47,21 @@ public class CamundaGoogleAuthenticationSuccessHandler implements Authentication
             identityService.saveUser(user);
         }
 
+        log.info("Comparing admin user id {} to user id {}", adminId, user.getId());
         if (user.getId().equals(adminId)) {
-            identityService.createMembership(oauth2User.getName(), "camunda-admin");
+            //add admin role to security context
             var newAuthorities = new ArrayList<SimpleGrantedAuthority>();
             newAuthorities.add(new SimpleGrantedAuthority("ROLE_camunda-admin"));
-            newAuthorities.addAll((Collection<SimpleGrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
+            newAuthorities.addAll((Collection<SimpleGrantedAuthority>) authentication.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(
-                            SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-                            SecurityContextHolder.getContext().getAuthentication().getCredentials(),
-                            newAuthorities)
+                    new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), newAuthorities)
             );
-        };
 
+            // if not already done grant admin group membership in Camunda
+            if (identityService.createUserQuery().memberOfGroup("camunda-admin").userId(user.getId()).singleResult() == null) {
+                identityService.createMembership(oauth2User.getName(), "camunda-admin");
+            }
+        }
         response.sendRedirect("/camunda/app/");
     }
 }

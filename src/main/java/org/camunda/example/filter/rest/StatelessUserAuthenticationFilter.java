@@ -4,6 +4,7 @@ package org.camunda.example.filter.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,17 +23,16 @@ public class StatelessUserAuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
+        log.info("Applying StatelessUserAuthenticationFilter");
         // Current limitation: Only works for the default engine
         ProcessEngine engine = EngineUtil.lookupProcessEngine("default");
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         String name;
 
         if (principal instanceof UserDetails) {
             name = ((UserDetails) principal).getUsername();
-            log.debug("Authentication UserDetails: {}", ((UserDetails) principal));
+            log.debug("Authentication UserDetails: {}", principal);
         } else {
             name = principal.toString();
         }
@@ -58,7 +58,7 @@ public class StatelessUserAuthenticationFilter implements Filter {
         List<String> groupIds;
         org.springframework.security.core.Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         groupIds = authentication.getAuthorities().stream()
-                .map(res -> res.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .map(res -> res.substring(5)) // Strip "ROLE_"
                 .collect(Collectors.toList());
         return groupIds;

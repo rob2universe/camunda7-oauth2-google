@@ -2,6 +2,8 @@ camunda:
   bpm:
     admin-user:
       id: 116915761348654177223
+      password: demo
+
     filter:
       create: All tasks
     authorization:

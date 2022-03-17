@@ -1,6 +1,5 @@
-package org.camunda.example.oauth2;
+package org.camunda.example.filter.rest;
 
-import org.camunda.example.filter.rest.StatelessUserAuthenticationFilter;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -23,17 +22,41 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .httpBasic(); // this is just an example, use any auth mechanism you like
-
+                .httpBasic();
+//                .authenticationEntryPoint(authenticationEntryPoint());
     }
 
+/*    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        var entryPoint = new RestAuthenticationEntryPoint();
+        entryPoint.setRealmName("camunda-auth");
+        return entryPoint;
+    }*/
+
+
+    @SuppressWarnings("rawtypes")
     @Bean
-    public FilterRegistrationBean statelessUserAuthenticationFilter(){
+    public FilterRegistrationBean statelessUserAuthenticationFilter() {
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
         filterRegistration.setFilter(new StatelessUserAuthenticationFilter());
-        filterRegistration.setOrder(102); // make sure the filter is registered after the Spring Security Filter Chain
+        filterRegistration.setOrder(102); // ensure  filter is registered after the Spring Security Filter Chain
         filterRegistration.addUrlPatterns("/engine-rest/*");
         return filterRegistration;
     }
 
+ /*   @Bean
+    public FilterRegistrationBean processEngineAuthenticationFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setName("camunda-auth");
+        registration.setFilter(getProcessEngineAuthenticationFilter());
+        registration.addInitParameter("authentication-provider",
+                "org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider");
+        registration.addUrlPatterns("/*");
+        return registration;
+    }
+
+    @Bean
+    public Filter getProcessEngineAuthenticationFilter() {
+        return new ProcessEngineAuthenticationFilter();
+    }*/
 }
