@@ -1,6 +1,8 @@
 # camunda7-oauth2-google
 
-This is an example Camunda 7 project with Spring Security and OAuth 2.0 SSO against Google.
+This is an example Camunda 7 project with Spring Security and 
+- OAuth 2.0 SSO against Google for the web applications
+- Http basic auth against the Camunda User Management for the REST API
 
 ## Setup
 Setup web application credentials at:
