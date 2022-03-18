@@ -1,4 +1,4 @@
-package org.camunda.example.oauth2;
+package org.camunda.example.sso.webapp.oauth2;
 
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.IdentityService;
@@ -18,7 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-// Maps Google user attributes to Camunda user attributes and creates the user in Camunda if it does not exist
+/* Maps Google user attributes to Camunda user attributes
+   and creates the user in Camunda if it does not exist */
 @Slf4j
 @Service
 public class CamundaGoogleAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -33,10 +34,10 @@ public class CamundaGoogleAuthenticationSuccessHandler implements Authentication
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+        // if user does not exist in Camunda user management create it
         User user = identityService.createUserQuery().userId(oauth2User.getName()).singleResult();
         if (user == null) {
             log.debug("Creating user for Google principal: {}", oauth2User.getName());
@@ -47,17 +48,16 @@ public class CamundaGoogleAuthenticationSuccessHandler implements Authentication
             identityService.saveUser(user);
         }
 
-        log.info("Comparing admin user id {} to user id {}", adminId, user.getId());
+        // if admin user id in properties matches oauth user id then grant admin authority
+        log.debug("Comparing admin userId {} to userId {}", adminId, user.getId());
         if (user.getId().equals(adminId)) {
             //add admin role to security context
             var newAuthorities = new ArrayList<SimpleGrantedAuthority>();
             newAuthorities.add(new SimpleGrantedAuthority("ROLE_camunda-admin"));
             newAuthorities.addAll((Collection<SimpleGrantedAuthority>) authentication.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), newAuthorities)
-            );
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), newAuthorities));
 
-            // if not already done grant admin group membership in Camunda
+            // if not already exists grant admin group membership in Camunda
             if (identityService.createUserQuery().memberOfGroup("camunda-admin").userId(user.getId()).singleResult() == null) {
                 identityService.createMembership(oauth2User.getName(), "camunda-admin");
             }
