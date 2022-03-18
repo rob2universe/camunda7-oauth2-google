@@ -9,8 +9,11 @@ Setup web application credentials at:
 ![Credentials configuration for web application in Google](/resources/images/createCredentials.png)
 
 ### References
-Generic SSO example: https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso
-Plugin mechanism used ofr logout redirect: https://camunda.com/blog/2020/08/all-new-frontend-plugin-system-for-cockpit-starting-with-camunda-bpm-7-14/
+Generic SSO example: https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso  
+
+Plugin mechanism used for logout redirect: https://camunda.com/blog/2020/08/all-new-frontend-plugin-system-for-cockpit-starting-with-camunda-bpm-7-14/
+
+Spring Security Http basic authentication flow
 https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html
 ### Other examples 
 Azure OAuth examples can be found here:
