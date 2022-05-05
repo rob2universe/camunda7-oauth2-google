@@ -1,18 +1,25 @@
-package org.camunda.example.config;
+package org.camunda.example.sso.rest;
 
-import org.camunda.example.filter.rest.StatelessUserAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-//@Configuration
+@Configuration
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 20)
 public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    CamundaSpringHttpAuthProvider authProvider;
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authProvider);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -23,17 +30,5 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .httpBasic(); // this is just an example, use any auth mechanism you like
-
-    }
-
-    @Bean
-    public FilterRegistrationBean statelessUserAuthenticationFilter(){
-        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-        filterRegistration.setFilter(new StatelessUserAuthenticationFilter());
-        filterRegistration.setOrder(102); // make sure the filter is registered after the Spring Security Filter Chain
-        filterRegistration.addUrlPatterns("/rest/*");
-        return filterRegistration;
-    }
-
-}
+                .httpBasic();
+    }}

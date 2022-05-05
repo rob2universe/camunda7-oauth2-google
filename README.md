@@ -1,19 +1,22 @@
 # camunda7-oauth2-google
 
-This is an example Camunda 7 project with Spring Security and OAuth 2.0 SSO against Google.
+This is an example Camunda 7 project with Spring Security and 
+- OAuth 2.0 SSO against Google for the web applications
+- Http basic auth against the Camunda User Management for the REST API
 
 ## Setup
+Setup web application credentials at:
+   https://console.cloud.google.com/projectselector2/apis/credentials
 
-
-https://console.cloud.google.com/projectselector2/apis/credentials
-
-
+![Credentials configuration for web application in Google](/resources/images/createCredentials.png)
 
 ### References
-https://developers.google.com/api-client-library/java
-https://developers.google.com/api-client-library/java/google-oauth-java-client/oauth2  
-Generic SSO example: https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso
+Generic SSO example: https://github.com/camunda-consulting/code/tree/master/snippets/springboot-security-sso  
 
+Plugin mechanism used for logout redirect: https://camunda.com/blog/2020/08/all-new-frontend-plugin-system-for-cockpit-starting-with-camunda-bpm-7-14/
+
+Spring Security Http basic authentication flow
+https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html
 ### Other examples 
 Azure OAuth examples can be found here:
 https://github.com/camunda-consulting/code/tree/master/snippets/azure-oauth2-cambpm-rest
