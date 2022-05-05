@@ -26,7 +26,7 @@ public class CamundaGoogleAuthenticationSuccessHandler implements Authentication
 
     private final IdentityService identityService;
 
-    @Value("${camunda.bpm.admin-user.id}")
+    @Value("${camunda.sso.admin-user-id}")
     private String adminId;
 
     public CamundaGoogleAuthenticationSuccessHandler(IdentityService identityService) {

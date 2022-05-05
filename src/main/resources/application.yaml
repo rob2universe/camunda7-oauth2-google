@@ -1,7 +1,9 @@
 camunda:
+  sso:
+    admin-user-id: 116915761348654177223
   bpm:
     admin-user:
-      id: 116915761348654177223
+      id: demo
       password: demo
 
     filter:
